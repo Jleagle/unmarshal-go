@@ -2,7 +2,10 @@ package unmarshal
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -31,10 +34,12 @@ func fix(source map[string]interface{}, destinationType reflect.Type) (ret map[s
 
 	// If source is empty
 	if reflect.DeepEqual(source, reflect.Zero(reflect.TypeOf(source)).Interface()) {
-
+		fmt.Println("empty source")
+		return nil
 	}
 
 	if destinationType.Kind() == reflect.Struct && source == nil {
+		fmt.Println("empty source")
 		return nil
 	}
 
@@ -44,43 +49,80 @@ func fix(source map[string]interface{}, destinationType reflect.Type) (ret map[s
 
 		fieldName := getJsonKey(destinationField)
 
-		srcVal := source[fieldName]
-		if srcVal == nil {
+		sourceVal := source[fieldName]
+		if sourceVal == nil {
 			continue
 		}
 
-		//srcValKind := reflect.TypeOf(srcVal).Kind()
+		srcValKind := reflect.TypeOf(sourceVal).Kind()
+		destinationFieldKind := destinationField.Type.Kind()
 
-		switch destinationField.Type.Kind() {
-
+		switch destinationFieldKind {
 		case reflect.String:
 
 			break
 
 		case reflect.Bool:
 
+			source[fieldName] = toBool(srcValKind, destinationFieldKind, sourceVal, fieldName)
 			break
 
 		default:
-
+			errLog(srcValKind, destinationFieldKind, fieldName)
 		}
 	}
 
 	return source
 }
 
+func toBool(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, srcVal interface{}, fieldName string) interface{} {
+
+	switch srcValKind {
+	case reflect.String:
+
+		b, err := strconv.ParseBool(srcVal.(string))
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		return b
+
+	case reflect.Int | reflect.Int64 | reflect.Float64:
+
+		return srcVal != 0
+
+	case reflect.Bool:
+
+		return srcVal
+
+	default:
+
+		errLog(srcValKind, destinationFieldKind, fieldName)
+		return nil
+	}
+}
+
 func getJsonKey(field reflect.StructField) (key string) {
 
 	tag := field.Tag.Get("json")
-	if tag != "" {
-		if commaIndex := strings.Index(tag, ","); commaIndex > 0 {
+	if tag == "" {
+
+		key = field.Name
+
+	} else {
+
+		commaIndex := strings.Index(tag, ",")
+		if commaIndex > 0 {
 			key = tag[:commaIndex]
 		} else {
 			key = tag
 		}
-	} else {
-		key = field.Name
 	}
 
 	return key
+}
+
+func errLog(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, fieldName string) {
+
+	log.Printf("Unable to convert %s to %s (%s)", srcValKind, destinationFieldKind, fieldName)
 }
