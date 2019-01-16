@@ -67,6 +67,11 @@ func fix(source map[string]interface{}, destinationType reflect.Type) (ret map[s
 			source[fieldName] = toBool(srcValKind, destinationFieldKind, sourceVal, fieldName)
 			break
 
+		case reflect.Int:
+
+			source[fieldName] = toInt(srcValKind, destinationFieldKind, sourceVal, fieldName)
+			break
+
 		case reflect.Float64:
 
 			source[fieldName] = toFloat(srcValKind, destinationFieldKind, sourceVal, fieldName)
@@ -118,7 +123,28 @@ func toFloat(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, srcVal 
 	}
 }
 
-func toBool(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, srcVal interface{}, fieldName string) interface{} {
+func toInt(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, srcVal interface{}, fieldName string) int {
+
+	switch srcValKind {
+	case reflect.Bool:
+
+		if srcVal.(bool) {
+			return 1
+		}
+		return 0
+
+	case reflect.Int:
+
+		return srcVal.(int)
+
+	default:
+
+		errLog(srcValKind, destinationFieldKind, fieldName)
+		return 0
+	}
+}
+
+func toBool(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, srcVal interface{}, fieldName string) bool {
 
 	switch srcValKind {
 	case reflect.String:
@@ -136,12 +162,12 @@ func toBool(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, srcVal i
 
 	case reflect.Bool:
 
-		return srcVal
+		return srcVal.(bool)
 
 	default:
 
 		errLog(srcValKind, destinationFieldKind, fieldName)
-		return nil
+		return false
 	}
 }
 
