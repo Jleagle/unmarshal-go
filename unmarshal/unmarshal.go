@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type mutator func(srcValKind reflect.Kind, destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{}
+type mutator func(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{}
 
 var mutators = map[reflect.Kind]mutator{}
 
@@ -17,10 +17,8 @@ func init() {
 	mutators[reflect.Float64] = floatMutator
 	mutators[reflect.Int] = intMutator
 	mutators[reflect.String] = stringMutator
-}
-
-func ErrLog(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, fieldName string) {
-	log.Printf("Unable to convert %s to %s (%s)", srcValKind, destinationFieldKind, fieldName)
+	mutators[reflect.Ptr] = pointerMutator
+	mutators[reflect.Slice] = sliceMutator
 }
 
 //noinspection GoUnusedExportedFunction
@@ -57,11 +55,6 @@ func mutate(source interface{}, destinationType reflect.Type) (ret map[string]in
 		return nil
 	}
 
-	if destinationType.Kind() == reflect.Struct && source == nil {
-		fmt.Println("empty source")
-		return nil
-	}
-
 	sourceMap, isMap := source.(map[string]interface{})
 	if isMap {
 		for i := 0; i < destinationType.NumField(); i++ {
@@ -69,25 +62,27 @@ func mutate(source interface{}, destinationType reflect.Type) (ret map[string]in
 			destinationField := destinationType.Field(i)
 
 			fieldName := getJsonKey(destinationField)
-
 			sourceVal := sourceMap[fieldName]
 			if sourceVal == nil {
 				continue
 			}
 
-			srcValKind := reflect.TypeOf(sourceVal).Kind()
-			destinationFieldKind := destinationField.Type
-
-			val, ok := mutators[destinationFieldKind.Kind()]
-			if ok {
-				sourceMap[fieldName] = val(srcValKind, destinationFieldKind, sourceVal, fieldName)
+			mutator, exists := mutators[destinationField.Type.Kind()]
+			if exists {
+				sourceMap[fieldName] = mutator(destinationField.Type, sourceVal, fieldName)
 			} else {
-				ErrLog(srcValKind, destinationFieldKind.Kind(), fieldName)
+				ErrLog(sourceVal, destinationField.Type.Kind(), fieldName)
 			}
 		}
 	}
 
 	return sourceMap
+}
+
+func ErrLog(sourceVal interface{}, destinationFieldKind reflect.Kind, fieldName string) {
+
+	srcValKind := reflect.TypeOf(sourceVal).Kind()
+	log.Printf("Unable to convert %s to %s (%s)", srcValKind, destinationFieldKind, fieldName)
 }
 
 func getJsonKey(field reflect.StructField) (key string) {

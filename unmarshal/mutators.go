@@ -6,7 +6,9 @@ import (
 	"strconv"
 )
 
-func stringMutator(srcValKind reflect.Kind, destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+func stringMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+
+	srcValKind := reflect.TypeOf(srcVal).Kind()
 
 	switch srcValKind {
 
@@ -37,7 +39,9 @@ func stringMutator(srcValKind reflect.Kind, destinationFieldType reflect.Type, s
 	}
 }
 
-func floatMutator(srcValKind reflect.Kind, destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+func floatMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+
+	srcValKind := reflect.TypeOf(srcVal).Kind()
 
 	switch srcValKind {
 
@@ -82,7 +86,9 @@ func floatMutator(srcValKind reflect.Kind, destinationFieldType reflect.Type, sr
 	}
 }
 
-func intMutator(srcValKind reflect.Kind, destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+func intMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+
+	srcValKind := reflect.TypeOf(srcVal).Kind()
 
 	switch srcValKind {
 	case reflect.Bool:
@@ -122,7 +128,9 @@ func intMutator(srcValKind reflect.Kind, destinationFieldType reflect.Type, srcV
 	}
 }
 
-func boolMutator(srcValKind reflect.Kind, destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+func boolMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+
+	srcValKind := reflect.TypeOf(srcVal).Kind()
 
 	switch srcValKind {
 	case reflect.String:
@@ -149,6 +157,12 @@ func boolMutator(srcValKind reflect.Kind, destinationFieldType reflect.Type, src
 	}
 }
 
-func pointerMutator(srcValKind reflect.Kind, destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+func pointerMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+
 	return mutate(srcVal, destinationFieldType.Elem())
+}
+
+func sliceMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+
+	return nil
 }
