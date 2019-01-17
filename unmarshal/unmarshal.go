@@ -2,7 +2,7 @@ package unmarshal
 
 import (
 	"encoding/json"
-	"github.com/pkg/errors"
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -120,5 +120,6 @@ func getJsonKey(field reflect.StructField) (key string) {
 func errLog(sourceVal interface{}, destinationFieldKind reflect.Kind, fieldName string) error {
 
 	srcValKind := reflect.TypeOf(sourceVal).Kind()
-	return errors.Errorf("Unable to convert %s to %s (%s)", srcValKind, destinationFieldKind, fieldName)
+
+	return fmt.Errorf("unable to convert %s to %s (%s)", srcValKind, destinationFieldKind, fieldName)
 }
