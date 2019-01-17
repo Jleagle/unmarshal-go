@@ -138,7 +138,90 @@ func pointerMutator(destinationFieldType reflect.Type, srcVal interface{}, field
 	return mutate(srcVal, destinationFieldType.Elem())
 }
 
-func sliceMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{} {
+func sliceMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
 
-	return nil
+	srcValKind := reflect.TypeOf(srcVal).Kind()
+
+	slice := make([]interface{}, 0)
+
+	switch srcValKind {
+	case reflect.Map:
+
+		for _, v := range srcVal.(map[string]interface{}) {
+			slice = append(slice, v)
+		}
+		return slice, err
+
+	case reflect.Slice:
+
+		return srcVal, err
+
+	case reflect.String:
+
+		s := srcVal.(string)
+
+		if strings.Contains(s, ",") {
+			var ret []string
+			for _, v := range strings.Split(s, ",") {
+				ret = append(ret, strings.TrimSpace(v))
+			}
+			return ret, err
+		}
+
+		break
+	}
+
+	return slice, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+}
+
+func mapMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
+
+	srcValKind := reflect.TypeOf(srcVal).Kind()
+
+	switch srcValKind {
+	case reflect.Map:
+
+		return srcVal, err
+	}
+
+	m := map[interface{}]interface{}{}
+	return m, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+}
+
+func structMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
+
+	srcValKind := reflect.TypeOf(srcVal).Kind()
+
+	switch destinationFieldType {
+	case reflect.TypeOf(inf.Dec{}):
+
+		d := &inf.Dec{}
+
+		srcValKind := reflect.TypeOf(srcVal).Kind()
+
+		switch srcValKind {
+
+		case reflect.Float64 | reflect.String:
+
+			if srcValKind == reflect.Float64 {
+				srcVal = strconv.FormatFloat(srcVal.(float64), 'g', -1, 64)
+			}
+
+			var success bool
+			d, success = d.SetString(srcVal.(string))
+			if !success {
+				return d, err
+			}
+		}
+
+		return d, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+
+	case reflect.TypeOf(time.Time{}):
+
+		t := time.Time{}
+
+		return t, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+	}
+
+	return srcVal, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
 }
