@@ -199,9 +199,7 @@ func structMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldN
 
 		srcValKind := reflect.TypeOf(srcVal).Kind()
 
-		switch srcValKind {
-
-		case reflect.Float64 | reflect.String:
+		if srcValKind == reflect.Float64 || srcValKind == reflect.String {
 
 			if srcValKind == reflect.Float64 {
 				srcVal = strconv.FormatFloat(srcVal.(float64), 'g', -1, 64)
@@ -219,6 +217,37 @@ func structMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldN
 	case reflect.TypeOf(time.Time{}):
 
 		t := time.Time{}
+
+		srcValKind := reflect.TypeOf(srcVal).Kind()
+
+		if srcValKind == reflect.Float64 || srcValKind == reflect.Int || srcValKind == reflect.String {
+
+			if srcValKind == reflect.Float64 {
+				srcVal = strconv.FormatFloat(srcVal.(float64), 'g', -1, 64)
+			}
+
+			if srcValKind == reflect.Int {
+				srcVal = strconv.FormatInt(int64(srcVal.(int)), 10)
+			}
+
+			timeStr := srcVal.(string)
+			timeLen := len(timeStr)
+
+			var dur time.Duration
+			if timeLen < 12 {
+				dur, err = time.ParseDuration(timeStr + "s") // Second
+			} else if timeLen < 15 {
+				dur, err = time.ParseDuration(timeStr + "ms") // Milli
+			} else if timeLen < 18 {
+				dur, err = time.ParseDuration(timeStr + "us") // Micro
+			} else {
+				dur, err = time.ParseDuration(timeStr + "ns") // Nano
+			}
+
+			t.Add(dur)
+
+			return t, err
+		}
 
 		return t, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
 	}
