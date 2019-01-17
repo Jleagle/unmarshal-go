@@ -5,9 +5,28 @@ import (
 	"fmt"
 	"log"
 	"reflect"
-	"strconv"
 	"strings"
 )
+
+type mutator func(srcValKind reflect.Kind, destinationFieldType reflect.Type, srcVal interface{}, fieldName string) interface{}
+
+var mutators = map[reflect.Kind]mutator{}
+
+func init() {
+	mutators[reflect.Bool] = boolMutator
+	mutators[reflect.Float64] = floatMutator
+	mutators[reflect.Int] = intMutator
+	mutators[reflect.String] = stringMutator
+}
+
+func ErrLog(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, fieldName string) {
+	log.Printf("Unable to convert %s to %s (%s)", srcValKind, destinationFieldKind, fieldName)
+}
+
+//noinspection GoUnusedExportedFunction
+func SetMutator(kind reflect.Kind, m mutator) {
+	mutators[kind] = m
+}
 
 func Unmarshal(in []byte, out interface{}) (err error) {
 
@@ -16,7 +35,7 @@ func Unmarshal(in []byte, out interface{}) (err error) {
 	err = json.Unmarshal(in, &m)
 
 	// Fix types
-	m = fix(m, reflect.TypeOf(out))
+	m = mutate(m, reflect.TypeOf(out))
 
 	// Marshal back into bytes
 	b, err := json.Marshal(m)
@@ -25,7 +44,7 @@ func Unmarshal(in []byte, out interface{}) (err error) {
 	return json.Unmarshal(b, out)
 }
 
-func fix(source map[string]interface{}, destinationType reflect.Type) (ret map[string]interface{}) {
+func mutate(source interface{}, destinationType reflect.Type) (ret map[string]interface{}) {
 
 	// get underlying type from ptr
 	if destinationType.Kind() == reflect.Ptr {
@@ -43,132 +62,32 @@ func fix(source map[string]interface{}, destinationType reflect.Type) (ret map[s
 		return nil
 	}
 
-	for i := 0; i < destinationType.NumField(); i++ {
+	sourceMap, isMap := source.(map[string]interface{})
+	if isMap {
+		for i := 0; i < destinationType.NumField(); i++ {
 
-		destinationField := destinationType.Field(i)
+			destinationField := destinationType.Field(i)
 
-		fieldName := getJsonKey(destinationField)
+			fieldName := getJsonKey(destinationField)
 
-		sourceVal := source[fieldName]
-		if sourceVal == nil {
-			continue
-		}
+			sourceVal := sourceMap[fieldName]
+			if sourceVal == nil {
+				continue
+			}
 
-		srcValKind := reflect.TypeOf(sourceVal).Kind()
-		destinationFieldKind := destinationField.Type.Kind()
+			srcValKind := reflect.TypeOf(sourceVal).Kind()
+			destinationFieldKind := destinationField.Type
 
-		switch destinationFieldKind {
-		case reflect.String:
-
-			break
-
-		case reflect.Bool:
-
-			source[fieldName] = toBool(srcValKind, destinationFieldKind, sourceVal, fieldName)
-			break
-
-		case reflect.Int:
-
-			source[fieldName] = toInt(srcValKind, destinationFieldKind, sourceVal, fieldName)
-			break
-
-		case reflect.Float64:
-
-			source[fieldName] = toFloat(srcValKind, destinationFieldKind, sourceVal, fieldName)
-			break
-
-		default:
-			errLog(srcValKind, destinationFieldKind, fieldName)
+			val, ok := mutators[destinationFieldKind.Kind()]
+			if ok {
+				sourceMap[fieldName] = val(srcValKind, destinationFieldKind, sourceVal, fieldName)
+			} else {
+				ErrLog(srcValKind, destinationFieldKind.Kind(), fieldName)
+			}
 		}
 	}
 
-	return source
-}
-
-func toFloat(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, srcVal interface{}, fieldName string) float64 {
-
-	switch srcValKind {
-
-	case reflect.String:
-
-		f, err := strconv.ParseFloat(srcVal.(string), 64)
-		if err != nil {
-			fmt.Println(err)
-		}
-		return f
-
-	case reflect.Int:
-
-		return float64(srcVal.(int))
-
-	case reflect.Int64:
-
-		return float64(srcVal.(int64))
-
-	case reflect.Float64:
-
-		return srcVal.(float64)
-
-	case reflect.Bool:
-
-		if srcVal.(bool) {
-			return 1
-		}
-		return 0
-
-	default:
-
-		errLog(srcValKind, destinationFieldKind, fieldName)
-		return 0
-	}
-}
-
-func toInt(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, srcVal interface{}, fieldName string) int {
-
-	switch srcValKind {
-	case reflect.Bool:
-
-		if srcVal.(bool) {
-			return 1
-		}
-		return 0
-
-	case reflect.Int:
-
-		return srcVal.(int)
-
-	default:
-
-		errLog(srcValKind, destinationFieldKind, fieldName)
-		return 0
-	}
-}
-
-func toBool(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, srcVal interface{}, fieldName string) bool {
-
-	switch srcValKind {
-	case reflect.String:
-
-		b, err := strconv.ParseBool(srcVal.(string))
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		return b
-
-	case reflect.Int | reflect.Int64 | reflect.Float64:
-
-		return srcVal != 0
-
-	case reflect.Bool:
-
-		return srcVal.(bool)
-
-	default:
-
-		errLog(srcValKind, destinationFieldKind, fieldName)
-		return false
-	}
+	return sourceMap
 }
 
 func getJsonKey(field reflect.StructField) (key string) {
@@ -189,9 +108,4 @@ func getJsonKey(field reflect.StructField) (key string) {
 	}
 
 	return key
-}
-
-func errLog(srcValKind reflect.Kind, destinationFieldKind reflect.Kind, fieldName string) {
-
-	log.Printf("Unable to convert %s to %s (%s)", srcValKind, destinationFieldKind, fieldName)
 }

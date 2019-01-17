@@ -46,9 +46,18 @@ type DestinationData struct {
 func Test(t *testing.T) {
 
 	src := SourceData{}
-	src.BoolFromInt = 1
-	src.BoolFromFloat = 1.5
-	src.BoolFromString = "1"
+	src.StringFromInt = 2
+	src.StringFromFloat = 2.2
+	src.StringFromBool = true
+	src.BoolFromInt = 2
+	src.BoolFromFloat = 2.2
+	src.BoolFromString = "2"
+	src.IntFromBool = true
+	src.IntFromFloat = 2.2
+	src.IntFromString = "2"
+	src.FloatFromInt = 2
+	src.FloatFromBool = true
+	src.FloatFromString = "2.2"
 
 	b, err := json.Marshal(src)
 	if err != nil {
