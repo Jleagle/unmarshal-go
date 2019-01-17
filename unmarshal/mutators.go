@@ -1,7 +1,7 @@
 package unmarshal
 
 import (
-	"gopkg.in/inf.v0"
+	"math/big"
 	"reflect"
 	"strconv"
 	"strings"
@@ -193,32 +193,47 @@ func structMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldN
 	srcValKind := reflect.TypeOf(srcVal).Kind()
 
 	switch destinationFieldType {
-	case reflect.TypeOf(inf.Dec{}):
+	case reflect.TypeOf(big.Int{}):
 
-		d := &inf.Dec{}
+		var bigInt = new(big.Int)
 
-		srcValKind := reflect.TypeOf(srcVal).Kind()
+		if srcValKind == reflect.Int {
+			bigInt = bigInt.SetInt64(int64(srcVal.(int)))
+			return bigInt, err
+		}
 
-		if srcValKind == reflect.Float64 || srcValKind == reflect.String {
-
-			if srcValKind == reflect.Float64 {
-				srcVal = strconv.FormatFloat(srcVal.(float64), 'g', -1, 64)
-			}
-
+		if srcValKind == reflect.String {
 			var success bool
-			d, success = d.SetString(srcVal.(string))
-			if !success {
-				return d, err
+			bigInt, success = bigInt.SetString(srcVal.(string), 10)
+			if success {
+				return bigInt, err
 			}
 		}
 
-		return d, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+		return bigInt, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+
+	case reflect.TypeOf(big.Float{}):
+
+		var bigFloat = new(big.Float)
+
+		if srcValKind == reflect.Float64 {
+			bigFloat = bigFloat.SetFloat64(srcVal.(float64))
+			return bigFloat, err
+		}
+
+		if srcValKind == reflect.String {
+			var success bool
+			bigFloat, success = bigFloat.SetString(srcVal.(string))
+			if success {
+				return bigFloat, err
+			}
+		}
+
+		return bigFloat, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
 
 	case reflect.TypeOf(time.Time{}):
 
 		t := time.Time{}
-
-		srcValKind := reflect.TypeOf(srcVal).Kind()
 
 		if srcValKind == reflect.Float64 || srcValKind == reflect.Int || srcValKind == reflect.String {
 
