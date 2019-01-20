@@ -34,7 +34,7 @@ func GetMutator(kind reflect.Kind) Mutator {
 
 func Unmarshal(in []byte, out interface{}) (err error) {
 
-	// Unmarshal into map
+	// Unmarshal into generic JSON map
 	m := map[string]interface{}{}
 	err = json.Unmarshal(in, &m)
 	if err != nil {
@@ -42,7 +42,7 @@ func Unmarshal(in []byte, out interface{}) (err error) {
 	}
 
 	// Fix types
-	m, err = mutate(m, reflect.TypeOf(out))
+	m, err = mutate(m, out)
 	if err != nil {
 		return err
 	}
@@ -57,11 +57,18 @@ func Unmarshal(in []byte, out interface{}) (err error) {
 	return json.Unmarshal(b, out)
 }
 
-func mutate(source interface{}, destinationType reflect.Type) (ret map[string]interface{}, err error) {
+func mutate(source interface{}, destination interface{}) (map[string]interface{}, error) {
 
-	// get underlying type from ptr
-	if destinationType.Kind() == reflect.Ptr {
+	var err error
+	var destinationType = reflect.TypeOf(destination)
+	var destinationKind = destinationType.Kind()
+	var destinationValue = reflect.ValueOf(destination)
+
+	// Get the real type of pointers
+	if destinationKind == reflect.Ptr {
 		destinationType = destinationType.Elem()
+		destinationKind = destinationType.Kind()
+		destinationValue = destinationValue.Elem()
 	}
 
 	// If source is empty
@@ -69,28 +76,52 @@ func mutate(source interface{}, destinationType reflect.Type) (ret map[string]in
 		return nil, nil
 	}
 
-	sourceMap, isMap := source.(map[string]interface{})
-	if isMap {
-		for i := 0; i < destinationType.NumField(); i++ {
+	sourceMap, sourceIsMap := source.(map[string]interface{})
+	if sourceIsMap {
 
-			destinationField := destinationType.Field(i)
+		switch k := destinationKind; k {
+		case reflect.Struct:
 
-			fieldName := getJsonKey(destinationField)
-			sourceVal := sourceMap[fieldName]
-			if sourceVal == nil {
-				continue
+			for i := 0; i < destinationType.NumField(); i++ {
+
+				destinationField := destinationType.Field(i)
+
+				fieldName := getJsonKey(destinationField)
+				sourceVal := sourceMap[fieldName]
+
+				if sourceVal == nil {
+					continue
+				}
+
+				mutator, exists := mutators[destinationField.Type.Kind()]
+				if exists {
+					sourceMap[fieldName], err = mutator(destinationField.Type, sourceVal, fieldName)
+				} else {
+					err = errLog(sourceVal, destinationField.Type.Kind(), fieldName)
+				}
 			}
 
-			mutator, exists := mutators[destinationField.Type.Kind()]
-			if exists {
-				sourceMap[fieldName], err = mutator(destinationField.Type, sourceVal, fieldName)
-			} else {
-				err = errLog(sourceVal, destinationField.Type.Kind(), fieldName)
+		case reflect.Map:
+
+			var destinationMapValueType = reflect.TypeOf(destination).Elem() // map[string]main.DestinationData
+
+			for _, key := range reflect.ValueOf(source).MapKeys() {
+
+				value := reflect.ValueOf(source).MapIndex(key)
+
+				out, err := mutate(value, destinationMapValueType)
+				if err != nil {
+					return sourceMap, err
+				}
+
+				fmt.Println(value)
+				fmt.Println(out)
+
+				destinationValue.SetMapIndex(key, reflect.ValueOf(out))
 			}
 
-			if err != nil {
-				return sourceMap, err
-			}
+		default:
+			return sourceMap, fmt.Errorf("can not marshal into a " + k.String())
 		}
 	}
 

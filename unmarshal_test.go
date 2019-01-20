@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/Jleagle/unmarshal-go/unmarshal"
 	"testing"
 )
@@ -45,19 +44,20 @@ type DestinationData struct {
 
 func Test(t *testing.T) {
 
-	src := SourceData{}
-	src.StringFromInt = 2
-	src.StringFromFloat = 2.2
-	src.StringFromBool = true
-	src.BoolFromInt = 2
-	src.BoolFromFloat = 2.2
-	src.BoolFromString = "2"
-	src.IntFromBool = true
-	src.IntFromFloat = 2.2
-	src.IntFromString = "2"
-	src.FloatFromInt = 2
-	src.FloatFromBool = true
-	src.FloatFromString = "2.2"
+	var src = SourceData{
+		StringFromInt:   2,
+		StringFromFloat: 2.2,
+		StringFromBool:  true,
+		BoolFromInt:     2,
+		BoolFromFloat:   2.2,
+		BoolFromString:  "2",
+		IntFromBool:     true,
+		IntFromFloat:    2.2,
+		IntFromString:   "2",
+		FloatFromInt:    2,
+		FloatFromBool:   true,
+		FloatFromString: "2.2",
+	}
 
 	b, err := json.Marshal(src)
 	if err != nil {
@@ -70,6 +70,43 @@ func Test(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+}
 
-	fmt.Println(dest)
+func TestMap(t *testing.T) {
+
+	var src = SourceData{
+		StringFromInt:   2,
+		StringFromFloat: 2.2,
+		StringFromBool:  true,
+		BoolFromInt:     2,
+		BoolFromFloat:   2.2,
+		BoolFromString:  "2",
+		IntFromBool:     true,
+		IntFromFloat:    2.2,
+		IntFromString:   "2",
+		FloatFromInt:    2,
+		FloatFromBool:   true,
+		FloatFromString: "2.2",
+	}
+
+	srcMap := map[string]SourceData{
+		"1": src,
+		"2": src,
+	}
+
+	b, err := json.Marshal(srcMap)
+	if err != nil {
+		t.Error(err)
+	}
+
+	destMap := map[string]DestinationData{}
+
+	err = unmarshal.Unmarshal(b, &destMap)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if destMap["1"].StringFromInt != "2" {
+		t.Error("not 2")
+	}
 }
