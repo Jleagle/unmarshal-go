@@ -114,10 +114,15 @@ func mutate(source interface{}, destination interface{}) (map[string]interface{}
 					return sourceMap, err
 				}
 
-				fmt.Println(value)
-				fmt.Println(out)
+				b, err := json.Marshal(out)
+				fmt.Println(err)
 
-				destinationValue.SetMapIndex(key, reflect.ValueOf(out))
+				var x interface{}
+
+				err = json.Unmarshal(b, &x)
+				fmt.Println(err)
+
+				destinationValue.SetMapIndex(key, reflect.ValueOf(x))
 			}
 
 		default:
