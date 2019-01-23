@@ -60,6 +60,7 @@ func Unmarshal(in []byte, out interface{}) (err error) {
 func mutate(source interface{}, destination interface{}) (map[string]interface{}, error) {
 
 	var err error
+
 	var destinationType = reflect.TypeOf(destination)
 	var destinationKind = destinationType.Kind()
 	var destinationValue = reflect.ValueOf(destination)
@@ -107,9 +108,9 @@ func mutate(source interface{}, destination interface{}) (map[string]interface{}
 
 			for _, key := range reflect.ValueOf(source).MapKeys() {
 
-				value := reflect.ValueOf(source).MapIndex(key)
+				// mapValue := reflect.ValueOf(sourceMap).MapIndex(key)
 
-				out, err := mutate(value, destinationMapValueType)
+				out, err := mutate(sourceMap, destinationMapValueType)
 				if err != nil {
 					return sourceMap, err
 				}
