@@ -2,13 +2,82 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/Jleagle/unmarshal-go/ctypes"
 	"github.com/Jleagle/unmarshal-go/unmarshal"
+	"reflect"
 	"testing"
 )
 
+type SourceCData struct {
+	StringFromInt   int     `json:"string_from_int"`
+	StringFromFloat float64 `json:"string_from_float"`
+	StringFromBool  bool    `json:"string_from_bool"`
+
+	BoolFromInt    int
+	BoolFromFloat  float64
+	BoolFromString string
+
+	IntFromBool   bool
+	IntFromFloat  float64
+	IntFromString string
+
+	FloatFromInt    int
+	FloatFromBool   bool
+	FloatFromString string
+}
+
+type DestinationCData struct {
+	StringFromInt   ctypes.CString `json:"string_from_int"`
+	StringFromFloat ctypes.CString `json:"string_from_float"`
+	StringFromBool  ctypes.CString `json:"string_from_bool"`
+
+	BoolFromInt    ctypes.CBool
+	BoolFromFloat  ctypes.CBool
+	BoolFromString ctypes.CBool
+
+	IntFromBool   ctypes.CInt
+	IntFromFloat  ctypes.CInt
+	IntFromString ctypes.CInt
+
+	FloatFromInt    ctypes.CFloat
+	FloatFromBool   ctypes.CFloat
+	FloatFromString ctypes.CFloat
+}
+
+func TestCTypes(t *testing.T) {
+
+	var src = SourceCData{
+		StringFromInt:   2,
+		StringFromFloat: 2.2,
+		StringFromBool:  true,
+		BoolFromInt:     2,
+		BoolFromFloat:   2.2,
+		BoolFromString:  "2",
+		IntFromBool:     true,
+		IntFromFloat:    2.2,
+		IntFromString:   "2",
+		FloatFromInt:    2,
+		FloatFromBool:   true,
+		FloatFromString: "2.2",
+	}
+
+	b, err := json.Marshal(src)
+	if err != nil {
+		t.Error(err)
+	}
+
+	dest := DestinationCData{}
+
+	err = json.Unmarshal(b, &dest)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 type SourceData struct {
-	StringFromInt int `json:"string_from_int"`
-	// StringFromFloat float64 `json:"string_from_float"`
+	StringFromInt   int     `json:"string_from_int"`
+	StringFromFloat float64 `json:"string_from_float"`
 	// StringFromBool  bool    `json:"string_from_bool"`
 	//
 	// BoolFromInt    int
@@ -25,8 +94,8 @@ type SourceData struct {
 }
 
 type DestinationData struct {
-	StringFromInt string `json:"string_from_int"`
-	// StringFromFloat string `json:"string_from_float"`
+	StringFromInt   string `json:"string_from_int"`
+	StringFromFloat string `json:"string_from_float"`
 	// StringFromBool  string `json:"string_from_bool"`
 	//
 	// BoolFromInt    bool
@@ -42,11 +111,11 @@ type DestinationData struct {
 	// FloatFromString float64
 }
 
-func Test(t *testing.T) {
+func TestStruct(t *testing.T) {
 
 	var src = SourceData{
-		StringFromInt: 2,
-		// StringFromFloat: 2.2,
+		StringFromInt:   2,
+		StringFromFloat: 2.2,
 		// StringFromBool:  true,
 		// BoolFromInt:     2,
 		// BoolFromFloat:   2.2,
@@ -75,8 +144,8 @@ func Test(t *testing.T) {
 func TestMap(t *testing.T) {
 
 	var src = SourceData{
-		StringFromInt: 2,
-		// StringFromFloat: 2.2,
+		StringFromInt:   2,
+		StringFromFloat: 2.2,
 		// StringFromBool:  true,
 		// BoolFromInt:     2,
 		// BoolFromFloat:   2.2,
@@ -109,4 +178,13 @@ func TestMap(t *testing.T) {
 	if destMap["1"].StringFromInt != "2" {
 		t.Error("not 2")
 	}
+}
+
+func TestDebug(t *testing.T) {
+
+	x := &DestinationData{}
+
+	fmt.Println(reflect.TypeOf(x))
+	fmt.Println(reflect.TypeOf(x).Kind())
+
 }
