@@ -85,6 +85,8 @@ func (i *CInt) UnmarshalJSON(b []byte) error {
 
 		*i = CInt(j)
 
+		return nil
+
 	case jsonparser.Boolean:
 
 		b, err := strconv.ParseBool(str)
@@ -98,56 +100,52 @@ func (i *CInt) UnmarshalJSON(b []byte) error {
 			*i = 0
 		}
 
+		return nil
+
 	case jsonparser.Null:
 
 		*i = 0
+
+		return nil
 
 	}
 
 	return errors.New("can not convert " + types[dataType] + " to int")
 }
 
-//
-// type CBool bool
-//
-// func (t *CBool) UnmarshalJSON(b []byte) error {
-//
-// 	var data, typex, _ = jsonparser.Get(b)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	switch typex {
-// 	case jsonparser.String:
-//
-// 		b, _ := strconv.ParseBool(data.(string))
-// 		return b, nil
-//
-// 	case jsonparser.Number:
-//
-// 		return data != 0
-//
-// 	case jsonparser.Object:
-// 		fmt.Println("OS X.")
-// 	case jsonparser.Array:
-// 		fmt.Println("OS X.")
-// 	case jsonparser.Boolean:
-//
-// 		return data.(bool)
-//
-// 	case jsonparser.Null:
-// 		fmt.Println("Linux.")
-// 	default:
-// 		return errors.New("can not convert " + strconv.Itoa(typex) + " to bool")
-// 	}
-//
-// 	fmt.Println(string(b))
-// 	fmt.Println(typex)
-//
-// 	*t = CBool("1" == string(raw))
-//
-// 	return nil
-// }
+type CBool bool
+
+func (i *CBool) UnmarshalJSON(b []byte) error {
+
+	var data, dataType, _, err = jsonparser.Get(b)
+	if err != nil {
+		return err
+	}
+
+	if len(data) == 0 {
+		*i = false
+		return nil
+	}
+
+	str := string(data)
+
+	switch dataType {
+	case jsonparser.String, jsonparser.Number, jsonparser.Boolean:
+
+		b, _ := strconv.ParseBool(str)
+		*i = CBool(b)
+
+		return nil
+
+	case jsonparser.Null:
+
+		*i = false
+
+	}
+
+	return errors.New("can not convert " + types[dataType] + " to bool")
+}
+
 //
 // type CFloat float64
 //
@@ -195,7 +193,7 @@ func (i *CInt) UnmarshalJSON(b []byte) error {
 //
 // 	return nil
 // }
-//
+
 // type ScStringSlice []string
 //
 // func (s *ScStringSlice) UnmarshalJSON(b []byte) error {
