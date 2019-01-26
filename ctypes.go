@@ -223,23 +223,56 @@ func (i *CFloat) UnmarshalJSON(b []byte) error {
 	return errors.New("can not convert " + types[dataType] + " to float64")
 }
 
-// type ScStringSlice []string
-//
-// func (s *ScStringSlice) UnmarshalJSON(b []byte) error {
-// 	var raw, err = jsonparser.GetString(b)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	if len(raw) == 0 {
-// 		return nil
-// 	}
-//
-// 	*s = ScStringSlice(strings.Split(raw, ","))
-//
-// 	return nil
-// }
-//
+type SStringSlice []string
+
+func (i *SStringSlice) UnmarshalJSON(b []byte) error {
+
+	var data, dataType, _, err = jsonparser.Get(b)
+	if err != nil {
+		return err
+	}
+
+	if len(data) == 0 {
+		*i = []string{}
+		return nil
+	}
+
+	str := string(data)
+
+	switch dataType {
+	case jsonparser.String:
+
+		*i = SStringSlice(strings.Split(str, ","))
+		return nil
+
+	case jsonparser.Number, jsonparser.Boolean:
+
+		*i = []string{str}
+		return nil
+
+	case jsonparser.Null:
+
+		*i = []string{}
+		return nil
+
+	}
+
+	return errors.New("can not convert " + types[dataType] + " to string slice")
+
+	// var raw, err = jsonparser.GetString(b)
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// if len(raw) == 0 {
+	// 	return nil
+	// }
+	//
+	// *i = ScStringSlice(strings.Split(raw, ","))
+	//
+	// return nil
+}
+
 // type IntSlice []int
 //
 // func (is IntSlice) UnmarshalJSON(e *xml.Encoder, start xml.StartElement) error {
