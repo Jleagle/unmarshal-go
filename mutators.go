@@ -1,4 +1,4 @@
-package unmarshal
+package main
 
 import (
 	"math/big"
@@ -35,7 +35,7 @@ func stringMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldN
 		return strconv.FormatBool(srcVal.(bool)), err
 	}
 
-	return "", errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+	return "", nil
 }
 
 func floatMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
@@ -73,7 +73,7 @@ func floatMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldNa
 		return 0, err
 	}
 
-	return 0, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+	return 0, nil
 }
 
 func intMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
@@ -106,7 +106,7 @@ func intMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName
 		return strconv.Atoi(s)
 	}
 
-	return 0, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+	return 0, nil
 }
 
 func boolMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
@@ -129,13 +129,13 @@ func boolMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldNam
 		return srcVal.(bool), err
 	}
 
-	return false, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+	return false, nil
 }
 
 //noinspection GoUnusedParameter
 func pointerMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
 
-	return mutate(srcVal, destinationFieldType.Elem())
+	return nil, nil
 }
 
 func sliceMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
@@ -171,7 +171,7 @@ func sliceMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldNa
 		break
 	}
 
-	return slice, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+	return slice, nil
 }
 
 func mapMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
@@ -185,7 +185,7 @@ func mapMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName
 	}
 
 	m := map[interface{}]interface{}{}
-	return m, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+	return m, nil
 }
 
 func structMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldName string) (i interface{}, err error) {
@@ -210,7 +210,7 @@ func structMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldN
 			}
 		}
 
-		return bigInt, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+		return bigInt, nil
 
 	case reflect.TypeOf(big.Float{}):
 
@@ -229,7 +229,7 @@ func structMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldN
 			}
 		}
 
-		return bigFloat, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+		return bigFloat, nil
 
 	case reflect.TypeOf(time.Time{}):
 
@@ -264,8 +264,8 @@ func structMutator(destinationFieldType reflect.Type, srcVal interface{}, fieldN
 			return t, err
 		}
 
-		return t, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+		return t, nil
 	}
 
-	return srcVal, errLog(srcValKind, destinationFieldType.Kind(), fieldName)
+	return srcVal, nil
 }
