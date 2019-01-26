@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/buger/jsonparser"
 	"strconv"
+	"strings"
 )
 
 var types = map[jsonparser.ValueType]string{
@@ -78,12 +79,23 @@ func (i *CInt) UnmarshalJSON(b []byte) error {
 	switch dataType {
 	case jsonparser.String, jsonparser.Number:
 
-		j, err := strconv.Atoi(str)
-		if err != nil {
-			return err
-		}
+		if strings.Contains(str, ".") {
 
-		*i = CInt(j)
+			j, err := strconv.ParseFloat(str, 64)
+			if err != nil {
+				return err
+			}
+			*i = CInt(j)
+
+		} else {
+
+			k, err := strconv.ParseInt(str, 10, 64)
+			if err != nil {
+				return err
+			}
+			*i = CInt(k)
+
+		}
 
 		return nil
 
@@ -147,52 +159,69 @@ func (i *CBool) UnmarshalJSON(b []byte) error {
 }
 
 //
-// type CFloat float64
-//
-// func (f *CFloat) UnmarshalJSON(b []byte) error {
-//
-// 	var raw = jsonparser.GetString(b)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	switch typex {
-// 	case jsonparser.String:
-//
-// 		s := raw.(string)
-// 		if s == "" {
-// 			return 0
-// 		}
-//
-// 		return strconv.ParseFloat(s, 64)
-//
-// 	case jsonparser.Number:
-//
-// 		return float64(raw.(int))
-//
-// 		return float64(raw.(int64))
-//
-// 		return raw.(float64)
-//
-// 		if raw.(bool) {
-// 			return 1
-// 		}
-// 		return 0
-//
-// 	case jsonparser.Object:
-// 		fmt.Println("OS X.")
-// 	case jsonparser.Array:
-// 		fmt.Println("OS X.")
-// 	case jsonparser.Boolean:
-// 		fmt.Println("Linux.")
-// 	case jsonparser.Null:
-// 		fmt.Println("Linux.")
-// 	default:
-// 		return errors.New("can not convert " + strconv.Itoa(typex) + " to bool")
-// 	}
-//
-// 	return nil
-// }
+type CFloat float64
+
+func (i *CFloat) UnmarshalJSON(b []byte) error {
+
+	var data, dataType, _, err = jsonparser.Get(b)
+	if err != nil {
+		return err
+	}
+
+	if len(data) == 0 {
+		*i = 0
+		return nil
+	}
+
+	str := string(data)
+
+	switch dataType {
+	case jsonparser.String, jsonparser.Number:
+
+		if strings.Contains(str, ".") {
+
+			j, err := strconv.ParseFloat(str, 64)
+			if err != nil {
+				return err
+			}
+			*i = CFloat(j)
+
+		} else {
+
+			k, err := strconv.ParseInt(str, 10, 64)
+			if err != nil {
+				return err
+			}
+			*i = CFloat(k)
+
+		}
+
+		return nil
+
+	case jsonparser.Boolean:
+
+		b, err := strconv.ParseBool(str)
+		if err != nil {
+			return err
+		}
+
+		if b {
+			*i = 1
+		} else {
+			*i = 0
+		}
+
+		return nil
+
+	case jsonparser.Null:
+
+		*i = 0
+		return nil
+
+	}
+
+	return errors.New("can not convert " + types[dataType] + " to float64")
+}
 
 // type ScStringSlice []string
 //
