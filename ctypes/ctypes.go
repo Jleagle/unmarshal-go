@@ -6,7 +6,6 @@ import (
 	"math/big"
 	"strconv"
 	"strings"
-	"time"
 )
 
 var types = map[jsonparser.ValueType]string{
@@ -34,10 +33,12 @@ func (i *CString) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
+	str := string(data)
+
 	switch dataType {
 	case jsonparser.String, jsonparser.Number, jsonparser.Boolean:
 
-		*i = CString(data)
+		*i = CString(str)
 		return nil
 
 	case jsonparser.Null:
@@ -394,6 +395,76 @@ func (i *SIntSlice) UnmarshalJSON(b []byte) error {
 
 type CBigInt big.Int
 
+func (i *CBigInt) UnmarshalJSON(b []byte) error {
+
+	var data, dataType, _, err = jsonparser.Get(b)
+	if err != nil {
+		return err
+	}
+
+	if len(data) == 0 {
+		*i = CBigInt{}
+		return nil
+	}
+
+	var str = string(data)
+
+	switch dataType {
+	case jsonparser.String, jsonparser.Number:
+
+		var bigInt *big.Int
+		bigInt, success := bigInt.SetString(str, 10)
+		if success {
+			return errors.New("bigInt.SetString error")
+		}
+
+		*i = CBigInt(*bigInt)
+		return nil
+
+	case jsonparser.Null:
+
+		*i = CBigInt(big.Int{})
+		return nil
+
+	}
+
+	return errors.New("can not convert: " + types[dataType] + " to bool")
+}
+
 type CBigFloat big.Float
 
-type CTime time.Time
+func (i *CBigFloat) UnmarshalJSON(b []byte) error {
+
+	var data, dataType, _, err = jsonparser.Get(b)
+	if err != nil {
+		return err
+	}
+
+	if len(data) == 0 {
+		*i = CBigFloat{}
+		return nil
+	}
+
+	var str = string(data)
+
+	switch dataType {
+	case jsonparser.String, jsonparser.Number:
+
+		var bigFloat *big.Float
+		bigFloat, success := bigFloat.SetString(str)
+		if success {
+			return errors.New("bigFloat.SetString error")
+		}
+
+		*i = CBigFloat(*bigFloat)
+		return nil
+
+	case jsonparser.Null:
+
+		*i = CBigFloat(big.Float{})
+		return nil
+
+	}
+
+	return errors.New("can not convert: " + types[dataType] + " to bool")
+}
