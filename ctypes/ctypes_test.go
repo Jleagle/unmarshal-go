@@ -42,9 +42,9 @@ type DestinationCData struct {
 	IntFromFloat  CInt
 	IntFromString CInt
 
-	FloatFromInt    CFloat
-	FloatFromBool   CFloat
-	FloatFromString CFloat
+	FloatFromInt    CFloat64
+	FloatFromBool   CFloat64
+	FloatFromString CFloat64
 }
 
 func TestCTypes(t *testing.T) {

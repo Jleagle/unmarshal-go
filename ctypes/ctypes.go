@@ -226,9 +226,9 @@ func (i *CBool) UnmarshalJSON(b []byte) error {
 }
 
 //
-type CFloat float64
+type CFloat64 float64
 
-func (i *CFloat) UnmarshalJSON(b []byte) error {
+func (i *CFloat64) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
@@ -251,7 +251,7 @@ func (i *CFloat) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*i = CFloat(j)
+			*i = CFloat64(j)
 
 		} else {
 
@@ -259,7 +259,7 @@ func (i *CFloat) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*i = CFloat(k)
+			*i = CFloat64(k)
 
 		}
 
