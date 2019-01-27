@@ -35,7 +35,7 @@ func (i *CString) UnmarshalJSON(b []byte) error {
 	}
 
 	switch dataType {
-	case jsonparser.String, jsonparser.Number, jsonparser.Boolean, jsonparser.Array:
+	case jsonparser.String, jsonparser.Number, jsonparser.Boolean:
 
 		*i = CString(data)
 		return nil
@@ -44,19 +44,18 @@ func (i *CString) UnmarshalJSON(b []byte) error {
 
 		*i = ""
 
-		// case jsonparser.Array:
-		//
-		// 	var sli []string
-		//
-		// 	_, err = jsonparser.ArrayEach(data, func(value2 []byte, dataType2 jsonparser.ValueType, offset int, err error) {
-		// 		sli = append(sli, string(value2))
-		// 	})
-		// 	if err != nil {
-		// 		return err
-		// 	}
-		//
-		// 	*i = CString(data)
-		// 	return nil
+	case jsonparser.Array:
+
+		var slice []string
+		_, err = jsonparser.ArrayEach(data, func(value2 []byte, dataType2 jsonparser.ValueType, offset int, err error) {
+			slice = append(slice, string(value2))
+		})
+		if err != nil {
+			return err
+		}
+
+		*i = CString(strings.Join(slice, ","))
+		return nil
 	}
 
 	return errors.New("can not convert: " + types[dataType] + " to bool")
