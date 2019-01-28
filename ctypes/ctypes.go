@@ -325,6 +325,19 @@ func (i *SStringSlice) UnmarshalJSON(b []byte) error {
 		*i = []string{}
 		return nil
 
+	case jsonparser.Object:
+
+		var slice []string
+		err := jsonparser.ObjectEach(data, func(key, value2 []byte, valueType2 jsonparser.ValueType, offset int) error {
+			slice = append(slice, string(value2))
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+
+		*i = SStringSlice(slice)
+		return nil
 	}
 
 	return errors.New("can not convert " + types[dataType] + " to string slice")
