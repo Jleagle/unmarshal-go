@@ -2,23 +2,13 @@ package ctypes
 
 import (
 	"errors"
-	"github.com/buger/jsonparser"
 	"math/big"
 	"strconv"
 	"strings"
 	"time"
-)
 
-var types = map[jsonparser.ValueType]string{
-	jsonparser.NotExist: "not-exist",
-	jsonparser.String:   "string",
-	jsonparser.Number:   "number",
-	jsonparser.Object:   "object",
-	jsonparser.Array:    "array",
-	jsonparser.Boolean:  "bool",
-	jsonparser.Null:     "null",
-	jsonparser.Unknown:  "unknown",
-}
+	"github.com/buger/jsonparser"
+)
 
 type CString string
 
@@ -61,7 +51,7 @@ func (i *CString) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	return errors.New("can not convert: " + types[dataType] + " to bool")
+	return errors.New("can not convert: " + dataType.String() + " to bool")
 }
 
 type CInt int
@@ -126,7 +116,7 @@ func (i *CInt) UnmarshalJSON(b []byte) error {
 
 	}
 
-	return errors.New("can not convert " + types[dataType] + " to int")
+	return errors.New("can not convert " + dataType.String() + " to int")
 }
 
 type CInt64 int64
@@ -191,7 +181,7 @@ func (i *CInt64) UnmarshalJSON(b []byte) error {
 
 	}
 
-	return errors.New("can not convert " + types[dataType] + " to int64")
+	return errors.New("can not convert " + dataType.String() + " to int64")
 }
 
 type CBool bool
@@ -225,7 +215,7 @@ func (i *CBool) UnmarshalJSON(b []byte) error {
 
 	}
 
-	return errors.New("can not convert " + types[dataType] + " to bool")
+	return errors.New("can not convert " + dataType.String() + " to bool")
 }
 
 //
@@ -290,7 +280,7 @@ func (i *CFloat64) UnmarshalJSON(b []byte) error {
 
 	}
 
-	return errors.New("can not convert " + types[dataType] + " to float64")
+	return errors.New("can not convert " + dataType.String() + " to float64")
 }
 
 type SStringSlice []string
@@ -340,7 +330,7 @@ func (i *SStringSlice) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	return errors.New("can not convert " + types[dataType] + " to string slice")
+	return errors.New("can not convert " + dataType.String() + " to string slice")
 }
 
 type SIntSlice []int
@@ -406,7 +396,7 @@ func (i *SIntSlice) UnmarshalJSON(b []byte) error {
 
 	}
 
-	return errors.New("can not convert " + types[dataType] + " to string slice")
+	return errors.New("can not convert " + dataType.String() + " to string slice")
 }
 
 type CBigInt big.Int
@@ -444,7 +434,7 @@ func (i *CBigInt) UnmarshalJSON(b []byte) error {
 
 	}
 
-	return errors.New("can not convert: " + types[dataType] + " to bool")
+	return errors.New("can not convert: " + dataType.String() + " to bool")
 }
 
 type CBigFloat big.Float
@@ -482,7 +472,7 @@ func (i *CBigFloat) UnmarshalJSON(b []byte) error {
 
 	}
 
-	return errors.New("can not convert: " + types[dataType] + " to bool")
+	return errors.New("can not convert: " + dataType.String() + " to bool")
 }
 
 type CTime time.Time
@@ -534,5 +524,5 @@ func (i *CTime) UnmarshalJSON(b []byte) error {
 
 	}
 
-	return errors.New("can not convert: " + types[dataType] + " to bool")
+	return errors.New("can not convert: " + dataType.String() + " to bool")
 }
