@@ -420,7 +420,7 @@ func (i *CBigInt) UnmarshalJSON(b []byte) error {
 
 		var bigInt *big.Int
 		bigInt, success := bigInt.SetString(str, 10)
-		if success {
+		if success || bigInt == nil {
 			return errors.New("bigInt.SetString error")
 		}
 
@@ -458,7 +458,7 @@ func (i *CBigFloat) UnmarshalJSON(b []byte) error {
 
 		var bigFloat *big.Float
 		bigFloat, success := bigFloat.SetString(str)
-		if success {
+		if success || bigFloat == nil {
 			return errors.New("bigFloat.SetString error")
 		}
 
