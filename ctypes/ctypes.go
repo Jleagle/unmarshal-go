@@ -283,9 +283,9 @@ func (i *CFloat64) UnmarshalJSON(b []byte) error {
 	return errors.New("can not convert " + dataType.String() + " to float64")
 }
 
-type SStringSlice []string
+type CStringSlice []string
 
-func (i *SStringSlice) UnmarshalJSON(b []byte) error {
+func (i *CStringSlice) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
@@ -302,7 +302,7 @@ func (i *SStringSlice) UnmarshalJSON(b []byte) error {
 	switch dataType {
 	case jsonparser.String:
 
-		*i = SStringSlice(strings.Split(str, ","))
+		*i = CStringSlice(strings.Split(str, ","))
 		return nil
 
 	case jsonparser.Number, jsonparser.Boolean:
@@ -326,16 +326,16 @@ func (i *SStringSlice) UnmarshalJSON(b []byte) error {
 			return err
 		}
 
-		*i = SStringSlice(slice)
+		*i = CStringSlice(slice)
 		return nil
 	}
 
 	return errors.New("can not convert " + dataType.String() + " to string slice")
 }
 
-type SIntSlice []int
+type CIntSlice []int
 
-func (i *SIntSlice) UnmarshalJSON(b []byte) error {
+func (i *CIntSlice) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
