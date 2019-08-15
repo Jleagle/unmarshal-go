@@ -302,7 +302,7 @@ func (i *CStringSlice) UnmarshalJSON(b []byte) error {
 	switch dataType {
 	case jsonparser.String:
 
-		*i = CStringSlice(strings.Split(str, ","))
+		*i = strings.Split(str, ",")
 		return nil
 
 	case jsonparser.Number, jsonparser.Boolean:
@@ -326,7 +326,7 @@ func (i *CStringSlice) UnmarshalJSON(b []byte) error {
 			return err
 		}
 
-		*i = CStringSlice(slice)
+		*i = slice
 		return nil
 	}
 
