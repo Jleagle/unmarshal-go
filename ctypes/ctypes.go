@@ -429,7 +429,7 @@ func (i *CBigInt) UnmarshalJSON(b []byte) error {
 
 	case jsonparser.Null:
 
-		*i = CBigInt(big.Int{})
+		*i = CBigInt{}
 		return nil
 
 	}
@@ -467,7 +467,7 @@ func (i *CBigFloat) UnmarshalJSON(b []byte) error {
 
 	case jsonparser.Null:
 
-		*i = CBigFloat(big.Float{})
+		*i = CBigFloat{}
 		return nil
 
 	}
@@ -485,7 +485,7 @@ func (i *CTime) UnmarshalJSON(b []byte) error {
 	}
 
 	if len(data) == 0 {
-		*i = CTime(time.Time{})
+		*i = CTime{}
 		return nil
 	}
 
@@ -519,7 +519,7 @@ func (i *CTime) UnmarshalJSON(b []byte) error {
 
 	case jsonparser.Null:
 
-		*i = CTime(time.Time{})
+		*i = CTime{}
 		return nil
 
 	}
