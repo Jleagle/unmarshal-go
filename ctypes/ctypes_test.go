@@ -6,9 +6,11 @@ import (
 )
 
 type SourceCData struct {
-	StringFromInt   int
-	StringFromFloat float64
-	StringFromBool  bool
+	StringFromInt     int
+	StringFromFloat   float64
+	StringFromBool    bool
+	StringFromObject  map[string]interface{}
+	StringFromObject2 map[string]interface{}
 
 	BoolFromInt     int
 	BoolFromFloat   float64
@@ -27,9 +29,11 @@ type SourceCData struct {
 }
 
 type DestinationCData struct {
-	StringFromInt   CString
-	StringFromFloat CString
-	StringFromBool  CString
+	StringFromInt     CString
+	StringFromFloat   CString
+	StringFromBool    CString
+	StringFromObject  CString
+	StringFromObject2 CString
 
 	BoolFromInt     CBool
 	BoolFromFloat   CBool
@@ -50,21 +54,23 @@ type DestinationCData struct {
 func TestCTypes(t *testing.T) {
 
 	var src = SourceCData{
-		StringFromInt:   2,
-		StringFromFloat: 2.2,
-		StringFromBool:  true,
-		BoolFromInt:     2,
-		BoolFromFloat:   2.2,
-		BoolFromString:  "2",
-		BoolFromString2: "1",
-		BoolFromString3: "true",
-		IntFromBool:     true,
-		IntFromBool2:    false,
-		IntFromFloat:    2.2,
-		IntFromString:   "2",
-		FloatFromInt:    2,
-		FloatFromBool:   true,
-		FloatFromString: "2.2",
+		StringFromInt:     2,
+		StringFromFloat:   2.2,
+		StringFromBool:    true,
+		StringFromObject:  map[string]interface{}{},
+		StringFromObject2: map[string]interface{}{"x": "x", "y": 1},
+		BoolFromInt:       2,
+		BoolFromFloat:     2.2,
+		BoolFromString:    "2",
+		BoolFromString2:   "1",
+		BoolFromString3:   "true",
+		IntFromBool:       true,
+		IntFromBool2:      false,
+		IntFromFloat:      2.2,
+		IntFromString:     "2",
+		FloatFromInt:      2,
+		FloatFromBool:     true,
+		FloatFromString:   "2.2",
 	}
 
 	b, err := json.Marshal(src)
@@ -79,6 +85,7 @@ func TestCTypes(t *testing.T) {
 		t.Error(err)
 	}
 
+	// To string
 	if dest.StringFromInt != "2" {
 		t.Error("StringFromInt: " + string(dest.StringFromInt) + "/" + string(CString("2")))
 	}
@@ -88,7 +95,14 @@ func TestCTypes(t *testing.T) {
 	if dest.StringFromBool != "true" {
 		t.Error("StringFromBool: " + string(dest.StringFromBool) + "/" + string(CString("true")))
 	}
+	if dest.StringFromObject != `{}` {
+		t.Error("StringFromObject: " + string(dest.StringFromObject) + "/" + string(CString(`{}`)))
+	}
+	if dest.StringFromObject2 != `{"x":"x","y":1}` {
+		t.Error("StringFromObject2: " + string(dest.StringFromObject2) + "/" + string(CString(`{"x":"x","y":1}`)))
+	}
 
+	// To bool
 	if dest.BoolFromInt != false {
 		t.Error("BoolFromInt")
 	}
@@ -99,12 +113,13 @@ func TestCTypes(t *testing.T) {
 		t.Error("BoolFromString")
 	}
 	if dest.BoolFromString2 != true {
-		t.Error("BoolFromString")
+		t.Error("BoolFromString2")
 	}
 	if dest.BoolFromString3 != true {
-		t.Error("BoolFromString")
+		t.Error("BoolFromString3")
 	}
 
+	// To int
 	if dest.IntFromBool != 1 {
 		t.Error("IntFromBool")
 	}
@@ -118,6 +133,7 @@ func TestCTypes(t *testing.T) {
 		t.Error("IntFromString")
 	}
 
+	// To float
 	if dest.FloatFromInt != 2 {
 		t.Error("FloatFromInt")
 	}

@@ -2,6 +2,7 @@ package ctypes
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/buger/jsonparser"
@@ -24,6 +25,11 @@ func (i *CString) UnmarshalJSON(b []byte) error {
 	str := string(data)
 
 	switch dataType {
+	case jsonparser.Object:
+
+		*i = CString(fmt.Sprint(str))
+		return nil
+
 	case jsonparser.String, jsonparser.Number, jsonparser.Boolean:
 
 		*i = CString(str)
