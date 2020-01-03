@@ -95,8 +95,8 @@ func TestCTypes(t *testing.T) {
 	if dest.StringFromBool != "true" {
 		t.Error("StringFromBool: " + string(dest.StringFromBool) + "/" + string(CString("true")))
 	}
-	if dest.StringFromObject != `{}` {
-		t.Error("StringFromObject: " + string(dest.StringFromObject) + "/" + string(CString(`{}`)))
+	if dest.StringFromObject != `` {
+		t.Error("StringFromObject: " + string(dest.StringFromObject) + "/" + string(CString(``)))
 	}
 	if dest.StringFromObject2 != `{"x":"x","y":1}` {
 		t.Error("StringFromObject2: " + string(dest.StringFromObject2) + "/" + string(CString(`{"x":"x","y":1}`)))

@@ -27,6 +27,10 @@ func (i *CString) UnmarshalJSON(b []byte) error {
 	switch dataType {
 	case jsonparser.Object:
 
+		if str == "{}" {
+			str = ""
+		}
+
 		*i = CString(fmt.Sprint(str))
 		return nil
 
