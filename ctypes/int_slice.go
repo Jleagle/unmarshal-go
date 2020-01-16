@@ -8,9 +8,9 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type CIntSlice []int
+type IntSlice []int
 
-func (i *CIntSlice) UnmarshalJSON(b []byte) error {
+func (i *IntSlice) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {

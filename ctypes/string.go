@@ -8,9 +8,9 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type CString string
+type String string
 
-func (i *CString) UnmarshalJSON(b []byte) error {
+func (i *String) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
@@ -31,12 +31,12 @@ func (i *CString) UnmarshalJSON(b []byte) error {
 			str = ""
 		}
 
-		*i = CString(fmt.Sprint(str))
+		*i = String(fmt.Sprint(str))
 		return nil
 
 	case jsonparser.String, jsonparser.Number, jsonparser.Boolean:
 
-		*i = CString(str)
+		*i = String(str)
 		return nil
 
 	case jsonparser.Null:
@@ -54,7 +54,7 @@ func (i *CString) UnmarshalJSON(b []byte) error {
 			return err
 		}
 
-		*i = CString(strings.Join(slice, ","))
+		*i = String(strings.Join(slice, ","))
 		return nil
 	}
 

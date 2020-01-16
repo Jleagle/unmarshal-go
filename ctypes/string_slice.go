@@ -7,9 +7,9 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type CStringSlice []string
+type StringSlice []string
 
-func (i *CStringSlice) UnmarshalJSON(b []byte) error {
+func (i *StringSlice) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {

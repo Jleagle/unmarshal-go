@@ -7,9 +7,9 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type CBool bool
+type Bool bool
 
-func (i *CBool) UnmarshalJSON(b []byte) error {
+func (i *Bool) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
@@ -36,7 +36,7 @@ func (i *CBool) UnmarshalJSON(b []byte) error {
 	case jsonparser.String, jsonparser.Number, jsonparser.Boolean:
 
 		b, _ := strconv.ParseBool(str)
-		*i = CBool(b)
+		*i = Bool(b)
 
 		return nil
 

@@ -7,9 +7,9 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type CTime time.Time
+type Time time.Time
 
-func (i *CTime) UnmarshalJSON(b []byte) error {
+func (i *Time) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
@@ -17,7 +17,7 @@ func (i *CTime) UnmarshalJSON(b []byte) error {
 	}
 
 	if len(data) == 0 {
-		*i = CTime{}
+		*i = Time{}
 		return nil
 	}
 
@@ -46,12 +46,12 @@ func (i *CTime) UnmarshalJSON(b []byte) error {
 
 		t.Add(dur)
 
-		*i = CTime(t)
+		*i = Time(t)
 		return nil
 
 	case jsonparser.Null:
 
-		*i = CTime{}
+		*i = Time{}
 		return nil
 
 	}

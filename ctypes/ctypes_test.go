@@ -31,28 +31,28 @@ type SourceCData struct {
 }
 
 type DestinationCData struct {
-	StringFromInt     CString
-	StringFromFloat   CString
-	StringFromBool    CString
-	StringFromObject  CString
-	StringFromObject2 CString
+	StringFromInt     String
+	StringFromFloat   String
+	StringFromBool    String
+	StringFromObject  String
+	StringFromObject2 String
 
-	BoolFromInt     CBool
-	BoolFromFloat   CBool
-	BoolFromString  CBool
-	BoolFromString2 CBool
-	BoolFromString3 CBool
-	BoolFromObject  CBool
-	BoolFromObject2 CBool
+	BoolFromInt     Bool
+	BoolFromFloat   Bool
+	BoolFromString  Bool
+	BoolFromString2 Bool
+	BoolFromString3 Bool
+	BoolFromObject  Bool
+	BoolFromObject2 Bool
 
-	IntFromBool   CInt
-	IntFromBool2  CInt
-	IntFromFloat  CInt
-	IntFromString CInt
+	IntFromBool   Int
+	IntFromBool2  Int
+	IntFromFloat  Int
+	IntFromString Int
 
-	FloatFromInt    CFloat64
-	FloatFromBool   CFloat64
-	FloatFromString CFloat64
+	FloatFromInt    Float64
+	FloatFromBool   Float64
+	FloatFromString Float64
 }
 
 func TestCTypes(t *testing.T) {
@@ -96,19 +96,19 @@ func TestCTypes(t *testing.T) {
 
 	// To string
 	if dest.StringFromInt != "2" {
-		t.Error("StringFromInt: " + string(dest.StringFromInt) + "/" + string(CString("2")))
+		t.Error("StringFromInt: " + string(dest.StringFromInt) + "/" + string(String("2")))
 	}
 	if dest.StringFromFloat != "2.2" {
-		t.Error("StringFromFloat: " + string(dest.StringFromFloat) + "/" + string(CString("2.2")))
+		t.Error("StringFromFloat: " + string(dest.StringFromFloat) + "/" + string(String("2.2")))
 	}
 	if dest.StringFromBool != "true" {
-		t.Error("StringFromBool: " + string(dest.StringFromBool) + "/" + string(CString("true")))
+		t.Error("StringFromBool: " + string(dest.StringFromBool) + "/" + string(String("true")))
 	}
 	if dest.StringFromObject != `` {
-		t.Error("StringFromObject: " + string(dest.StringFromObject) + "/" + string(CString(``)))
+		t.Error("StringFromObject: " + string(dest.StringFromObject) + "/" + string(String(``)))
 	}
 	if dest.StringFromObject2 != `{"x":"x","y":1}` {
-		t.Error("StringFromObject2: " + string(dest.StringFromObject2) + "/" + string(CString(`{"x":"x","y":1}`)))
+		t.Error("StringFromObject2: " + string(dest.StringFromObject2) + "/" + string(String(`{"x":"x","y":1}`)))
 	}
 
 	// To bool

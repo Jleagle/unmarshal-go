@@ -8,9 +8,9 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type CInt64 int64
+type Int64 int64
 
-func (i *CInt64) UnmarshalJSON(b []byte) error {
+func (i *Int64) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
@@ -33,7 +33,7 @@ func (i *CInt64) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*i = CInt64(j)
+			*i = Int64(j)
 
 		} else {
 
@@ -41,7 +41,7 @@ func (i *CInt64) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*i = CInt64(k)
+			*i = Int64(k)
 
 		}
 

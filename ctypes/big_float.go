@@ -7,9 +7,9 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type CBigFloat big.Float
+type BigFloat big.Float
 
-func (i *CBigFloat) UnmarshalJSON(b []byte) error {
+func (i *BigFloat) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
@@ -17,7 +17,7 @@ func (i *CBigFloat) UnmarshalJSON(b []byte) error {
 	}
 
 	if len(data) == 0 {
-		*i = CBigFloat{}
+		*i = BigFloat{}
 		return nil
 	}
 
@@ -32,12 +32,12 @@ func (i *CBigFloat) UnmarshalJSON(b []byte) error {
 			return errors.New("bigFloat.SetString error")
 		}
 
-		*i = CBigFloat(*bigFloat)
+		*i = BigFloat(*bigFloat)
 		return nil
 
 	case jsonparser.Null:
 
-		*i = CBigFloat{}
+		*i = BigFloat{}
 		return nil
 
 	}

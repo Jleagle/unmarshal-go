@@ -8,9 +8,9 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type CFloat64 float64
+type Float64 float64
 
-func (i *CFloat64) UnmarshalJSON(b []byte) error {
+func (i *Float64) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
@@ -33,7 +33,7 @@ func (i *CFloat64) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*i = CFloat64(j)
+			*i = Float64(j)
 
 		} else {
 
@@ -41,7 +41,7 @@ func (i *CFloat64) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*i = CFloat64(k)
+			*i = Float64(k)
 
 		}
 
