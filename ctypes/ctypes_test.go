@@ -17,6 +17,8 @@ type SourceCData struct {
 	BoolFromString  string
 	BoolFromString2 string
 	BoolFromString3 string
+	BoolFromObject  map[string]interface{}
+	BoolFromObject2 map[string]interface{}
 
 	IntFromBool   bool
 	IntFromBool2  bool
@@ -40,6 +42,8 @@ type DestinationCData struct {
 	BoolFromString  CBool
 	BoolFromString2 CBool
 	BoolFromString3 CBool
+	BoolFromObject  CBool
+	BoolFromObject2 CBool
 
 	IntFromBool   CInt
 	IntFromBool2  CInt
@@ -59,18 +63,23 @@ func TestCTypes(t *testing.T) {
 		StringFromBool:    true,
 		StringFromObject:  map[string]interface{}{},
 		StringFromObject2: map[string]interface{}{"x": "x", "y": 1},
-		BoolFromInt:       2,
-		BoolFromFloat:     2.2,
-		BoolFromString:    "2",
-		BoolFromString2:   "1",
-		BoolFromString3:   "true",
-		IntFromBool:       true,
-		IntFromBool2:      false,
-		IntFromFloat:      2.2,
-		IntFromString:     "2",
-		FloatFromInt:      2,
-		FloatFromBool:     true,
-		FloatFromString:   "2.2",
+
+		BoolFromInt:     2,
+		BoolFromFloat:   2.2,
+		BoolFromString:  "2",
+		BoolFromString2: "1",
+		BoolFromString3: "true",
+		BoolFromObject:  map[string]interface{}{},
+		BoolFromObject2: map[string]interface{}{"x": "x", "y": 1},
+
+		IntFromBool:   true,
+		IntFromBool2:  false,
+		IntFromFloat:  2.2,
+		IntFromString: "2",
+
+		FloatFromInt:    2,
+		FloatFromBool:   true,
+		FloatFromString: "2.2",
 	}
 
 	b, err := json.Marshal(src)
@@ -117,6 +126,12 @@ func TestCTypes(t *testing.T) {
 	}
 	if dest.BoolFromString3 != true {
 		t.Error("BoolFromString3")
+	}
+	if dest.BoolFromObject != false {
+		t.Error("BoolFromObject")
+	}
+	if dest.BoolFromObject2 != true {
+		t.Error("BoolFromObject2")
 	}
 
 	// To int

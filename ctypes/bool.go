@@ -24,6 +24,15 @@ func (i *CBool) UnmarshalJSON(b []byte) error {
 	str := string(data)
 
 	switch dataType {
+	case jsonparser.Object:
+
+		if str == "{}" {
+			*i = false
+		} else {
+			*i = true
+		}
+		return nil
+
 	case jsonparser.String, jsonparser.Number, jsonparser.Boolean:
 
 		b, _ := strconv.ParseBool(str)
