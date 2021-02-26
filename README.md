@@ -1,6 +1,6 @@
 # unmarshal-go
 
-A collection of helper structs to unmarshal JSON where the types don't quite match.
+A collection of helper types, to unmarshal JSON where the types don't quite match.
 
 `go get -u github.com/Jleagle/unmarshal-go`
 
