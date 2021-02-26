@@ -1,7 +1,6 @@
 package unmarshal
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 
@@ -71,5 +70,5 @@ func (i *IntSlice) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	return errors.New("can not convert " + dataType.String() + " to string slice")
+	return newError(dataType, "[]int")
 }

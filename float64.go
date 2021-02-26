@@ -1,7 +1,6 @@
 package unmarshal
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 
@@ -67,5 +66,5 @@ func (i *Float64) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	return errors.New("can not convert " + dataType.String() + " to float64")
+	return newError(dataType, "float64")
 }

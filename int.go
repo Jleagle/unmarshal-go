@@ -1,7 +1,6 @@
 package unmarshal
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 
@@ -68,5 +67,5 @@ func (i *Int) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	return errors.New("can not convert " + dataType.String() + " to int")
+	return newError(dataType, "int")
 }

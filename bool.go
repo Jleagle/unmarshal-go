@@ -1,7 +1,6 @@
 package unmarshal
 
 import (
-	"errors"
 	"strconv"
 
 	"github.com/buger/jsonparser"
@@ -46,5 +45,5 @@ func (i *Bool) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	return errors.New("can not convert " + dataType.String() + " to bool")
+	return newError(dataType, "bool")
 }

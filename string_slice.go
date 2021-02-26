@@ -1,7 +1,6 @@
 package unmarshal
 
 import (
-	"errors"
 	"strings"
 
 	"github.com/buger/jsonparser"
@@ -54,5 +53,5 @@ func (i *StringSlice) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	return errors.New("can not convert " + dataType.String() + " to string slice")
+	return newError(dataType, "[]string")
 }
