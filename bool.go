@@ -44,7 +44,6 @@ func (i *Bool) UnmarshalJSON(b []byte) error {
 
 		*i = false
 		return nil
-
 	}
 
 	return errors.New("can not convert " + dataType.String() + " to bool")

@@ -62,13 +62,13 @@ func (i *IntSlice) UnmarshalJSON(b []byte) error {
 		} else {
 			*i = []int{0}
 		}
+
 		return nil
 
 	case jsonparser.Null:
 
 		*i = []int{}
 		return nil
-
 	}
 
 	return errors.New("can not convert " + dataType.String() + " to string slice")

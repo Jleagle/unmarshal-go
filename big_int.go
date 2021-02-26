@@ -39,7 +39,6 @@ func (i *BigInt) UnmarshalJSON(b []byte) error {
 
 		*i = BigInt{}
 		return nil
-
 	}
 
 	return errors.New("can not convert: " + dataType.String() + " to bool")

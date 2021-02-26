@@ -8,9 +8,9 @@ import (
 	"github.com/buger/jsonparser"
 )
 
-type Int int
+type Float64 float64
 
-func (i *Int) UnmarshalJSON(b []byte) error {
+func (i *Float64) UnmarshalJSON(b []byte) error {
 
 	var data, dataType, _, err = jsonparser.Get(b)
 	if err != nil {
@@ -33,7 +33,7 @@ func (i *Int) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*i = Int(j)
+			*i = Float64(j)
 
 		} else {
 
@@ -41,8 +41,7 @@ func (i *Int) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*i = Int(k)
-
+			*i = Float64(k)
 		}
 
 		return nil
@@ -65,10 +64,8 @@ func (i *Int) UnmarshalJSON(b []byte) error {
 	case jsonparser.Null:
 
 		*i = 0
-
 		return nil
-
 	}
 
-	return errors.New("can not convert " + dataType.String() + " to int")
+	return errors.New("can not convert " + dataType.String() + " to float64")
 }

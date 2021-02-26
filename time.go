@@ -53,7 +53,6 @@ func (i *Time) UnmarshalJSON(b []byte) error {
 
 		*i = Time{}
 		return nil
-
 	}
 
 	return errors.New("can not convert: " + dataType.String() + " to bool")
