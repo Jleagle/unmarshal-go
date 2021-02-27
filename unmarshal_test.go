@@ -55,7 +55,7 @@ type DestinationCData struct {
 	FloatFromString Float64
 }
 
-func TestCTypes(t *testing.T) {
+func TestConversions(t *testing.T) {
 
 	var src = SourceCData{
 		StringFromInt:     2,
